@@ -3,7 +3,7 @@
 WebBluetooth APIを利用し、ブラウザ上からSwitchBotを操作するコードです。
 
 2019-03-02時点でWebBluetooth APIはGoogle Chromeでのみサポートされています。  
-Google Chrome以外での検証は行っていません。
+Google Chrome以外での検証は行っていません。
 
 ## セットアップ
 
@@ -17,7 +17,7 @@ Google Chromeの再起動が必要です。
 
 ## サンプル
 
-https://jun.enomoto.me/switchbot-webbluetooth/
+https://jun.enomoto.me/switchbot-webbluetooth/index.html
 
 ## 実行
 
