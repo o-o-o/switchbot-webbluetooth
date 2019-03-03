@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>SwitchBot - WebBluetooth</title>
+    <script type="text/javascript">
+        const SERVICE_UUID = 'cba20d00-224d-11e6-9fb8-0002a5d5c51b';
+        const CHARACTERISTIC_UUID = 'cba20002-224d-11e6-9fb8-0002a5d5c51b';
+        const PRESS_VALUE = new Uint8Array([0x57, 0x01, 0x00]);
+        const ON_VALUE = new Uint8Array([0x57, 0x01, 0x01]);
+        const OFF_VALUE = new Uint8Array([0x57, 0x01, 0x02]);
+        const pairedDevices = [];
+        window.addEventListener('DOMContentLoaded', init);
+        function init(e) {
+            const pairButton = document.getElementById('pair');
+            pairButton.addEventListener('click', pair);
+        }
+        async function pair(e) {
+            const options = {
+                acceptAllDevices: true,
+                // filters: [{ name: 'WoHand' }],
+                optionalServices: [SERVICE_UUID]
+            };
+            try {
+                console.log(`Requesting Bluetooth Device... with' + ${JSON.stringify(options)}`);
+                const device = await navigator.bluetooth.requestDevice(options);
+                console.log(`Got the device: ${device}`);
+                console.log('Connecting to GATT Server...');
+                await device.gatt.connect();
+                pairedDevices.push(device);
+                console.log(device);
+
+                const ul = document.getElementById('pairedDevices');
+                const li = document.createElement('li');
+                li.appendChild(document.createTextNode(`${device.name} - ${device.id}`));
+                ul.appendChild(li);
+
+                const press = document.createElement('button');
+                press.appendChild(document.createTextNode`press`)
+                press.addEventListener('click', async (e) => {
+                    await write(device, PRESS_VALUE);
+                })
+                li.appendChild(press);
+
+                const on = document.createElement('button');
+                on.appendChild(document.createTextNode`on`)
+                on.addEventListener('click', async (e) => {
+                    await write(device, ON_VALUE);
+                })
+                li.appendChild(on);
+
+                const off = document.createElement('button');
+                off.appendChild(document.createTextNode`off`)
+                off.addEventListener('click', async (e) => {
+                    await write(device, OFF_VALUE);
+                })
+                li.appendChild(off);
+
+            } catch (e) {
+                console.error(e);
+            }
+        }
+        async function write(device, value) {
+            try {
+                console.log('Connecting to GATT Server...');
+                const server = await device.gatt.connect();
+                console.log('Getting Service...');
+                const service = await server.getPrimaryService(SERVICE_UUID);
+                console.log(`Got the service: ${service}`);
+                console.log(service);
+
+                console.log('Getting Characteristic...');
+                const characteristic = await service.getCharacteristic(CHARACTERISTIC_UUID);
+                console.log`Got the Characteristic ${characteristic}`;
+                console.log(characteristic);
+                console.log`Writing value...`;
+                characteristic.writeValue(value);
+            } catch (e) {
+                console.error(e);
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <button id="pair">Pair</button>
+    <ul id="pairedDevices">
+    </ul>
+</body>
+
+</html>
